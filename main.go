@@ -1,3 +1,4 @@
+//go:build windows
 // +build windows
 
 package main
@@ -8,11 +9,37 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime/debug"
 	"strings"
 
 	"github.com/tg123/certstore"
 	"github.com/urfave/cli/v2"
 )
+
+var mainver string = "(devel)"
+
+func version() string {
+
+	var v = mainver
+
+	bi, ok := debug.ReadBuildInfo()
+	if !ok {
+		return v
+	}
+
+	for _, s := range bi.Settings {
+		switch s.Key {
+		case "vcs.revision":
+			v = fmt.Sprintf("%v, %v", v, s.Value[:9])
+		case "vcs.time":
+			v = fmt.Sprintf("%v, %v", v, s.Value)
+		}
+	}
+
+	v = fmt.Sprintf("%v, %v", v, bi.GoVersion)
+
+	return v
+}
 
 func openstore(c *cli.Context) (certstore.Store, error) {
 
@@ -32,7 +59,8 @@ func openstore(c *cli.Context) (certstore.Store, error) {
 func main() {
 
 	app := &cli.App{
-		Usage: "The missing cert management tools for windows nano",
+		Usage:   "The missing cert management tools for windows nano",
+		Version: version(),
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "store-name",
@@ -128,7 +156,7 @@ func main() {
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:     "thumbprint",
-						Aliases: []string{"t"},
+						Aliases:  []string{"t"},
 						Usage:    "thumbprint of the certificate to be deleted",
 						Required: true,
 					},
