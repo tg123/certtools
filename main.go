@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/github/certstore"
+	"github.com/tg123/certstore"
 	"github.com/urfave/cli/v2"
 )
 
